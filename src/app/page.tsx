@@ -1,61 +1,140 @@
+import { getAllStations, getStates, getOperators } from "@/lib/data";
+import JsonLd from "@/components/JsonLd";
+import Link from "next/link";
+
 export default function Home() {
+  const stations = getAllStations();
+  const states = getStates();
+  const operators = getOperators();
+  const totalPlugs = stations.reduce((sum, s) => sum + s.numPlugs, 0);
+
+  const dcCount = stations.filter((s) => s.chargerType === "DC").length;
+  const acCount = stations.filter((s) => s.chargerType === "AC").length;
+
   return (
-    <div className="space-y-12">
+    <>
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "AU EV Charging Finder",
+          url: "https://ev-charging.rollersoft.com.au",
+          description: "Find electric vehicle charging stations across Australia",
+        }}
+      />
+
       {/* Hero */}
-      <section className="hero min-h-[40vh] bg-base-200 rounded-box">
-        <div className="hero-content text-center">
-          <div className="max-w-2xl">
-            <h1 className="text-5xl font-bold">SITE_TITLE</h1>
-            <p className="py-6 text-lg text-base-content/70">SITE_DESCRIPTION</p>
-            {/* Search bar scaffold */}
-            <div className="form-control w-full max-w-lg mx-auto">
-              <div className="input-group flex">
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  className="input input-bordered flex-1"
-                />
-                <button className="btn btn-primary">Search</button>
-              </div>
+      <section className="bg-primary text-primary-content py-16">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">⚡ AU EV Charging Finder</h1>
+          <p className="text-xl opacity-90 mb-8">
+            Find {stations.length.toLocaleString()} electric vehicle charging stations across Australia
+          </p>
+          <div className="stats stats-vertical md:stats-horizontal shadow bg-primary-content text-primary">
+            <div className="stat">
+              <div className="stat-title text-primary/60">Stations</div>
+              <div className="stat-value">{stations.length.toLocaleString()}</div>
+            </div>
+            <div className="stat">
+              <div className="stat-title text-primary/60">Plugs</div>
+              <div className="stat-value">{totalPlugs.toLocaleString()}</div>
+            </div>
+            <div className="stat">
+              <div className="stat-title text-primary/60">DC Fast</div>
+              <div className="stat-value">{dcCount}</div>
+            </div>
+            <div className="stat">
+              <div className="stat-title text-primary/60">AC</div>
+              <div className="stat-value">{acCount}</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats scaffold */}
-      <section className="stats stats-vertical lg:stats-horizontal shadow w-full">
-        <div className="stat">
-          <div className="stat-title">Total Records</div>
-          <div className="stat-value">0</div>
-          <div className="stat-desc">From public data sources</div>
+      <div className="container mx-auto px-4 py-12">
+        {/* Beta notice */}
+        <div className="alert alert-info mb-8">
+          <span>📊 Beta: Currently covering {stations.length.toLocaleString()} stations in NSW & ACT. National data coming soon.</span>
         </div>
-        <div className="stat">
-          <div className="stat-title">Categories</div>
-          <div className="stat-value">0</div>
-        </div>
-        <div className="stat">
-          <div className="stat-title">Last Updated</div>
-          <div className="stat-value text-lg">2026</div>
-        </div>
-      </section>
 
-      {/* Card grid scaffold */}
-      <section>
-        <h2 className="text-2xl font-bold mb-6">Browse</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="card bg-base-100 shadow-md hover:shadow-lg transition-shadow border border-base-300">
-              <div className="card-body">
-                <h3 className="card-title">Item {i}</h3>
-                <p className="text-base-content/60">Description placeholder</p>
-                <div className="card-actions justify-end">
-                  <a className="btn btn-primary btn-sm">View Details</a>
+        {/* Browse by State */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-6">Browse by State</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {states.map((state) => (
+              <Link
+                key={state.code}
+                href={`/state/${state.code.toLowerCase()}`}
+                className="card bg-base-200 hover:bg-base-300 transition-colors"
+              >
+                <div className="card-body">
+                  <h3 className="card-title">{state.name}</h3>
+                  <p className="text-2xl font-bold text-primary">{state.count}</p>
+                  <p className="text-sm opacity-70">charging stations</p>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        {/* Top Operators */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold mb-6">Top Charging Networks</h2>
+          <div className="overflow-x-auto">
+            <table className="table table-zebra">
+              <thead>
+                <tr>
+                  <th>Network / Operator</th>
+                  <th className="text-right">Stations</th>
+                  <th className="text-right">Share</th>
+                </tr>
+              </thead>
+              <tbody>
+                {operators.slice(0, 15).map((op) => (
+                  <tr key={op.name}>
+                    <td>{op.name || "Independent / Unknown"}</td>
+                    <td className="text-right font-mono">{op.count}</td>
+                    <td className="text-right font-mono">
+                      {((op.count / stations.length) * 100).toFixed(1)}%
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        {/* Recent Stations */}
+        <section>
+          <h2 className="text-2xl font-bold mb-6">Featured Stations</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {stations.slice(0, 12).map((station) => (
+              <Link
+                key={station.id}
+                href={`/station/${station.id}`}
+                className="card bg-base-200 hover:shadow-lg transition-shadow"
+              >
+                <div className="card-body">
+                  <h3 className="card-title text-base">{station.name}</h3>
+                  <p className="text-sm opacity-70">{station.address}</p>
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    <span className={`badge ${station.chargerType === "DC" ? "badge-primary" : "badge-secondary"}`}>
+                      {station.chargerType} {station.chargerRatingKW}kW
+                    </span>
+                    <span className="badge badge-outline">{station.numPlugs} plugs</span>
+                    {station.connectors.map((c) => (
+                      <span key={c.type} className="badge badge-ghost badge-sm">{c.type}</span>
+                    ))}
+                  </div>
+                  {station.operator && (
+                    <p className="text-xs opacity-50 mt-1">{station.operator}</p>
+                  )}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      </div>
+    </>
   );
 }

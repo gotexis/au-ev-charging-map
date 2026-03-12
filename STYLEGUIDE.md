@@ -1,19 +1,16 @@
 # Style Guide
 
 ## 设计参考
-- [参考网站1 URL] — 借鉴要素（配色/布局/卡片/字体/间距）
-- [参考网站2 URL] — 借鉴要素
-
-## DaisyUI Theme
-`data-theme="DAISY_THEME"` — 在 layout.tsx 中设置
+- plugshare.com — Clean map-centric design, filter sidebar, station cards
+- chargefox.com — Green/electric branding, card-based listings
 
 ## 配色方案
-- Primary: #2563eb (修改 globals.css @theme)
-- Secondary: #7c3aed
-- Accent: #f59e0b
+DaisyUI theme: emerald (green EV theme)
+Primary: Green (#059669)
+Accent: Electric blue (#0ea5e9)
 
 ## 设计决策
-- [ ] 卡片风格：
-- [ ] 布局模式：
-- [ ] 字体层级：
-- [ ] 间距规范：
+- Card-based station listings with connector type badges
+- State-based navigation for SEO
+- Stats dashboard on homepage
+- Green/electric branding throughout

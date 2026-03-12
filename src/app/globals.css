@@ -1,9 +1,8 @@
 @import "tailwindcss";
 @plugin "daisyui";
 
-/* STYLEGUIDE: Replace theme colors based on your STYLEGUIDE.md */
 @theme {
-  --color-primary: #2563eb;
-  --color-secondary: #7c3aed;
+  --color-primary: #059669;
+  --color-secondary: #0ea5e9;
   --color-accent: #f59e0b;
 }

@@ -1,5 +1,5 @@
 {
-  "name": "starmap-template",
+  "name": "au-ev-charging-map",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "scrape": "echo 'Add your scraper command here'"
+    "scrape": "python3 scripts/scrape.py"
   },
   "dependencies": {
     "daisyui": "^5.5.19",
