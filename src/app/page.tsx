@@ -1,6 +1,7 @@
 import { getAllStations, getStates, getOperators } from "@/lib/data";
 import JsonLd from "@/components/JsonLd";
 import Link from "next/link";
+import MapView from "@/components/MapView";
 
 export default function Home() {
   const stations = getAllStations();
@@ -10,6 +11,16 @@ export default function Home() {
 
   const dcCount = stations.filter((s) => s.chargerType === "DC").length;
   const acCount = stations.filter((s) => s.chargerType === "AC").length;
+
+  const mapMarkers = stations.map((s) => ({
+    lat: s.lat,
+    lng: s.lng,
+    label: s.name || "EV Charger",
+    operator: s.operator,
+    chargerType: `${s.chargerType} ${s.chargerRatingKW}kW`,
+    popup: `${s.numPlugs} plugs • ${s.address}`,
+    href: `/station/${s.id}`,
+  }));
 
   return (
     <>
@@ -51,12 +62,15 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="container mx-auto px-4 py-12">
-        {/* Beta notice */}
-        <div className="alert alert-info mb-8">
-          <span>📊 Beta: Currently covering {stations.length.toLocaleString()} stations in NSW & ACT. National data coming soon.</span>
+      {/* Interactive Map */}
+      <section className="container mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold mb-4">🗺️ All Charging Stations</h2>
+        <div className="rounded-xl overflow-hidden shadow-lg border border-base-300">
+          <MapView markers={mapMarkers} height="600px" />
         </div>
+      </section>
 
+      <div className="container mx-auto px-4 py-12">
         {/* Browse by State */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold mb-6">Browse by State</h2>
@@ -104,7 +118,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Recent Stations */}
+        {/* Featured Stations */}
         <section>
           <h2 className="text-2xl font-bold mb-6">Featured Stations</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

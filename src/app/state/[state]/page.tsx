@@ -2,6 +2,7 @@ import { getStationsByState, getStates } from "@/lib/data";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import MapView from "@/components/MapView";
 
 const STATE_NAMES: Record<string, string> = {
   nsw: "New South Wales",
@@ -61,6 +62,23 @@ export default async function StatePage({ params }: { params: Promise<Params> })
       <p className="text-lg opacity-70 mb-6">
         {stations.length} charging stations • {dcCount} DC fast • {acCount} AC
       </p>
+
+      <div className="rounded-xl overflow-hidden shadow-lg border border-base-300 mb-8">
+        <MapView
+          markers={stations.map((s) => ({
+            lat: s.lat,
+            lng: s.lng,
+            label: s.name || "EV Charger",
+            operator: s.operator,
+            chargerType: `${s.chargerType} ${s.chargerRatingKW}kW`,
+            popup: `${s.numPlugs} plugs`,
+            href: `/station/${s.id}`,
+          }))}
+          center={[stations.reduce((a, s) => a + s.lat, 0) / stations.length, stations.reduce((a, s) => a + s.lng, 0) / stations.length]}
+          zoom={6}
+          height="450px"
+        />
+      </div>
 
       {lgas.map(([lga, lgaStations]) => (
         <section key={lga} className="mb-8">
